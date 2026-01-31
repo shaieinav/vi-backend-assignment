@@ -1,4 +1,13 @@
-const movies = { // [movie:id]
+/**
+ * Marvel movies and actors data for the Vi assignment.
+ * Maps movie titles to their TMDB IDs and lists actors of interest.
+ */
+
+/**
+ * Marvel movies with their TMDB IDs
+ * @type {Object.<string, number>}
+ */
+export const movies = {
     'Fantastic Four (2005)': 9738,
     'Fantastic Four: Rise of the Silver Surfer': 1979,
     'Iron Man': 1726,
@@ -25,9 +34,13 @@ const movies = { // [movie:id]
     'Captain Marvel': 299537,
     'Avengers: Endgame': 299534,
     'Spider-Man: Far From Home': 429617
-}
+};
 
-const actors = [
+/**
+ * List of Marvel actors to track
+ * @type {string[]}
+ */
+export const actors = [
     'Robert Downey Jr.',
     'Chris Evans',
     'Mark Ruffalo',
@@ -51,9 +64,4 @@ const actors = [
     'Black Panther',
     'Samuel L. Jackson',
     'Dave Bautista',
-]
-
-export {
-    movies,
-    actors
-}
+];
