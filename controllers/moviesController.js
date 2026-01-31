@@ -1,3 +1,5 @@
+import logger from '../utils/logger.js';
+
 /**
  * Factory function to create a movies controller.
  * Uses dependency injection for testability and flexibility.
@@ -15,7 +17,7 @@ export function createMoviesController(movieDataService) {
                 const data = await movieDataService.getMoviesPerActor();
                 res.json(data);
             } catch (error) {
-                console.error('Error in getMoviesPerActor:', error.message);
+                logger.error({ err: error }, 'Error in getMoviesPerActor');
                 res.status(500).json({ error: 'Failed to fetch movie data' });
             }
         },
@@ -29,7 +31,7 @@ export function createMoviesController(movieDataService) {
                 const data = await movieDataService.getActorsWithMultipleCharacters();
                 res.json(data);
             } catch (error) {
-                console.error('Error in getActorsWithMultipleCharacters:', error.message);
+                logger.error({ err: error }, 'Error in getActorsWithMultipleCharacters');
                 res.status(500).json({ error: 'Failed to fetch movie data' });
             }
         },
@@ -43,7 +45,7 @@ export function createMoviesController(movieDataService) {
                 const data = await movieDataService.getCharactersWithMultipleActors();
                 res.json(data);
             } catch (error) {
-                console.error('Error in getCharactersWithMultipleActors:', error.message);
+                logger.error({ err: error }, 'Error in getCharactersWithMultipleActors');
                 res.status(500).json({ error: 'Failed to fetch movie data' });
             }
         }
