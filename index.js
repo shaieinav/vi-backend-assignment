@@ -1,9 +1,34 @@
 import 'dotenv/config';
-import express from "express";
+import express from 'express';
+
+// Data
+import { movies, actors } from './data/marvelMovies.js';
+
+// Services
+import * as tmdbService from './services/tmdbService.js';
+import { MovieDataService } from './services/movieDataService.js';
+
+// Controller
+import { createMoviesController } from './controllers/moviesController.js';
+
 const app = express();
-import { movies, actors } from "./dataForQuestions.js";
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
-    console.log(movies);
-    console.log(actors);
+const PORT = process.env.PORT || 3000;
+
+// Composition root - assemble dependencies
+const movieDataService = new MovieDataService({
+    tmdbService,
+    movies,
+    actors
+});
+
+const moviesController = createMoviesController(movieDataService);
+
+// Routes
+app.get('/moviesPerActor', moviesController.getMoviesPerActor);
+app.get('/actorsWithMultipleCharacters', moviesController.getActorsWithMultipleCharacters);
+app.get('/charactersWithMultipleActors', moviesController.getCharactersWithMultipleActors);
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
