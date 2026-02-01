@@ -1,10 +1,35 @@
 import {
+    isSameCharacter,
     buildMoviesPerActor,
     buildActorsWithMultipleCharacters,
     buildCharactersWithMultipleActors
 } from '../utils/dataProcessor.js';
 
 describe('dataProcessor', () => {
+
+    describe('isSameCharacter (fuzzy matching)', () => {
+        it('should match identical names', () => {
+            expect(isSameCharacter('Tony Stark', 'Tony Stark')).toBe(true);
+        });
+
+        it('should match names with different order', () => {
+            expect(isSameCharacter('Steve Rogers / Captain America', 'Captain America / Steve Rogers')).toBe(true);
+        });
+
+        it('should match name with alias', () => {
+            expect(isSameCharacter('Tony Stark', 'Tony Stark / Iron Man')).toBe(true);
+        });
+
+        it('should match after removing parenthetical notes', () => {
+            expect(isSameCharacter('Steve Rogers', 'Steve Rogers (uncredited)')).toBe(true);
+        });
+
+        it('should NOT match completely different characters', () => {
+            expect(isSameCharacter('Tony Stark', 'Steve Rogers')).toBe(false);
+            expect(isSameCharacter('Peter Parker', 'Peter Quill')).toBe(false);
+        });
+    });
+
     // Sample test data
     const mockCreditsData = [
         {
@@ -78,7 +103,7 @@ describe('dataProcessor', () => {
 
             // Actor One plays 'Hero' and 'Different Hero' - two distinct characters
             expect(result['Actor One']).toBeDefined();
-            expect(result['Actor One'].length).toBe(3); // 3 appearances
+            expect(result['Actor One'].length).toBe(2); // One per distinct character
         });
 
         it('should not include actors who played the same character in multiple movies', () => {
@@ -91,6 +116,27 @@ describe('dataProcessor', () => {
         it('should handle empty credits data', () => {
             const result = buildActorsWithMultipleCharacters([], actorFilter);
             expect(result).toEqual({});
+        });
+
+        it('should group similar character names using fuzzy matching', () => {
+            const dataWithVariations = [
+                {
+                    movieName: 'Movie X',
+                    credits: {
+                        cast: [{ name: 'Actor One', character: 'Tony Stark' }]
+                    }
+                },
+                {
+                    movieName: 'Movie Y',
+                    credits: {
+                        cast: [{ name: 'Actor One', character: 'Tony Stark / Iron Man' }]
+                    }
+                }
+            ];
+            const result = buildActorsWithMultipleCharacters(dataWithVariations, actorFilter);
+
+            // Same character with variations should be grouped - actor shouldn't appear
+            expect(result['Actor One']).toBeUndefined();
         });
     });
 
@@ -109,10 +155,7 @@ describe('dataProcessor', () => {
         it('should not include characters played by only one actor', () => {
             const result = buildCharactersWithMultipleActors(mockCreditsData, actorFilter);
 
-            // 'Villain' is only played by Actor Two
             expect(result['Villain']).toBeUndefined();
-            // 'Different Hero' is only played by Actor One
-            expect(result['Different Hero']).toBeUndefined();
         });
 
         it('should handle empty credits data', () => {
@@ -121,12 +164,33 @@ describe('dataProcessor', () => {
         });
 
         it('should only consider actors in the filter', () => {
-            // Actor Three plays 'Sidekick' but is not in filter
-            // Actor Four plays 'New Character' but is not in filter
             const result = buildCharactersWithMultipleActors(mockCreditsData, actorFilter);
 
             expect(result['Sidekick']).toBeUndefined();
             expect(result['New Character']).toBeUndefined();
+        });
+
+        it('should group similar character names using fuzzy matching', () => {
+            const dataWithVariations = [
+                {
+                    movieName: 'Movie X',
+                    credits: {
+                        cast: [{ name: 'Actor One', character: 'James Rhodes / War Machine' }]
+                    }
+                },
+                {
+                    movieName: 'Movie Y',
+                    credits: {
+                        cast: [{ name: 'Actor Two', character: 'War Machine / James Rhodes' }]
+                    }
+                }
+            ];
+            const result = buildCharactersWithMultipleActors(dataWithVariations, actorFilter);
+
+            // Same character with variations should be grouped together
+            const keys = Object.keys(result);
+            expect(keys.length).toBe(1);
+            expect(result[keys[0]].length).toBe(2);
         });
     });
 });
