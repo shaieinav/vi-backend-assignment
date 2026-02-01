@@ -57,11 +57,11 @@ export const actors = [
     'Gwyneth Paltrow',
     'Bradley Cooper',
     'Tom Holland',
-    'Zoe Saldana',
+    'Zoe Saldaña',
     'Anthony Mackie',
     'Tom Hiddleston',
     'Chris Pratt',
-    'Black Panther',
+    'Chadwick Boseman',
     'Samuel L. Jackson',
     'Dave Bautista',
 ];
